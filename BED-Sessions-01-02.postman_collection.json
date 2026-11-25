@@ -1,0 +1,472 @@
+{
+  "info": {
+    "name": "BED Classwork | Sessions 01 and 02",
+    "description": "Start the matching session and run its folder. Use an unused publisher ID and a disposable copy for the write examples.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "authorId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "publisherId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "practicePublisherId",
+      "value": "30000",
+      "type": "string"
+    },
+    {
+      "key": "copyIsbn",
+      "value": "0000000003",
+      "type": "string"
+    },
+    {
+      "key": "copyNo",
+      "value": "2",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Session 01",
+      "item": [
+        {
+          "name": "Welcome message",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Welcome text\", () => pm.expect(pm.response.text()).to.include(\"Welcome to the Book Category API\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List book categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Three categories\", () => pm.expect(pm.response.json()).to.have.lengthOf(3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read the About message",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/about",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"About text\", () => pm.expect(pm.response.text()).to.include(\"Express API\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session 02",
+      "item": [
+        {
+          "name": "Read data",
+          "item": [
+            {
+              "name": "Check the API",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List authors",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/authors",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get one author",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/authors/{{authorId}}",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Reject an invalid author ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/authors/abc",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List publishers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/publishers",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get one publisher",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/publishers/{{publisherId}}",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Publisher CRUD",
+          "description": "Run this folder in order with an unused practicePublisherId.",
+          "item": [
+            {
+              "name": "Create a practice publisher",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/publishers",
+                "description": "Choose an unused ID in Variables.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": {{practicePublisherId}},\n  \"name\": \"Practice Press\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Read the practice publisher",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/publishers/{{practicePublisherId}}",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Publisher name\", () => pm.expect(pm.response.json().Name).to.eql(\"Practice Press\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update the practice publisher",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/publishers/{{practicePublisherId}}",
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Practice Press Updated\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Confirm the updated name",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/publishers/{{practicePublisherId}}",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Updated name\", () => pm.expect(pm.response.json().Name).to.eql(\"Practice Press Updated\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete the practice publisher",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/publishers/{{practicePublisherId}}",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));",
+                      "pm.test(\"Empty response\", () => pm.expect(pm.response.text()).to.eql(\"\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Confirm the publisher is gone",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/publishers/{{practicePublisherId}}",
+                "description": ""
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Copy updates",
+          "description": "Optional. Set copyIsbn and copyNo to an existing disposable copy first. Use the SSMS checks file to set up the practice copies if needed.",
+          "item": [
+            {
+              "name": "Update one copy field",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/copies/{{copyIsbn}}/{{copyNo}}",
+                "description": "Edit the rental rate only.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rentalRate\": 3.5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update the rate and status",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/copies/{{copyIsbn}}/{{copyNo}}",
+                "description": "Supply both fields for this route.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rentalRate\": 3,\n  \"status\": \"D\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

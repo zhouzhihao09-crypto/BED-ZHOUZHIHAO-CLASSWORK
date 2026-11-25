@@ -1,0 +1,925 @@
+{
+  "info": {
+    "name": "BED Classwork | Sessions 03 and 04",
+    "description": "Start the matching session server and run that folder in order. Session 03 creates a book and deletes disposable copy 1. Setup and repeat-run notes are in the repository README. Session 04 rents and returns disposable copy 2.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "seededIsbn",
+      "value": "0099826704",
+      "type": "string"
+    },
+    {
+      "key": "createdIsbn",
+      "value": "0000000002",
+      "type": "string"
+    },
+    {
+      "key": "rollbackIsbn",
+      "value": "0000000004",
+      "type": "string"
+    },
+    {
+      "key": "authorId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "missingAuthorId",
+      "value": "999",
+      "type": "string"
+    },
+    {
+      "key": "copyFixtureIsbn",
+      "value": "0000000003",
+      "type": "string"
+    },
+    {
+      "key": "rentalCopyNo",
+      "value": "2",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Session 03",
+      "description": "Run with session3-library-api. Create the Lab 7 test copies first.",
+      "item": [
+        {
+          "name": "Lab 6 - Book Routes",
+          "item": [
+            {
+              "name": "List all books",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books"
+                  ]
+                },
+                "description": "An empty catalog still returns an array."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Look up an ISBN with leading zeroes",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{seededIsbn}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{seededIsbn}}"
+                  ]
+                },
+                "description": "Compare the response ISBN to the original string."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Keeps leading zeroes\", () => pm.expect(pm.response.json().ISBN).to.eql(pm.variables.get(\"seededIsbn\")));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create a book and its author link",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/books",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books"
+                  ]
+                },
+                "description": "Open Body > raw > JSON to edit title, yearPublish, publisherId and bookCat. The isbn and authorId come from collection Variables. Set createdIsbn to an unused 10-character ISBN before a repeat run so the follow-up requests use the same value. Use Update the book created above to edit an existing book.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isbn\": \"{{createdIsbn}}\",\n  \"title\": \"Lab Test Book\",\n  \"yearPublish\": \"2026\",\n  \"publisherId\": null,\n  \"bookCat\": null,\n  \"authorId\": {{authorId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update the book created above",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{createdIsbn}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{createdIsbn}}"
+                  ]
+                },
+                "description": "Updates the details of the book from the previous request.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Lab Test Book Updated\",\n  \"yearPublish\": \"2026\",\n  \"publisherId\": null,\n  \"bookCat\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List the author's books",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/authors/{{authorId}}/books",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "authors",
+                    "{{authorId}}",
+                    "books"
+                  ]
+                },
+                "description": "The JOIN should include the book created above."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Includes the new book\", () => pm.expect(pm.response.json().map(book => book.ISBN)).to.include(pm.variables.get(\"createdIsbn\")));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Trigger a failed author link",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/books",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books"
+                  ]
+                },
+                "description": "Use an unused rollbackIsbn and an author ID absent from Author to trigger a foreign-key error after the first insert.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isbn\": \"{{rollbackIsbn}}\",\n  \"title\": \"Lab Test Book\",\n  \"yearPublish\": \"2026\",\n  \"publisherId\": null,\n  \"bookCat\": null,\n  \"authorId\": {{missingAuthorId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 500\", () => pm.response.to.have.status(500));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Confirm the failed book was rolled back",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{rollbackIsbn}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{rollbackIsbn}}"
+                  ]
+                },
+                "description": "Run immediately after the failed author link. The book should be absent."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab 7 - Book Copies",
+          "item": [
+            {
+              "name": "Read copy 1",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "1"
+                  ]
+                },
+                "description": "Create both Lab 7 test copies first."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update the rate for copy 1",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "1"
+                  ]
+                },
+                "description": "OUTPUT INSERTED returns the updated row.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rentalRate\": 3.5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"New rate is 3.50\", () => pm.expect(pm.response.json().RentalRate).to.eql(3.5));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "See the SQL CHECK reject a low rate",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "1"
+                  ]
+                },
+                "description": "Run on Session 03. Compare with the 400 in Lab 9.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rentalRate\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 500\", () => pm.response.to.have.status(500));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete disposable copy 1",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "1"
+                  ]
+                },
+                "description": "This removes the Lab 7 test row. Keep copyFixtureIsbn set to your disposable test book."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));",
+                      "pm.test(\"Empty response body\", () => pm.expect(pm.response.text()).to.eql(\"\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Confirm copy 1 is gone",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "1"
+                  ]
+                },
+                "description": "Check the exact row that was deleted."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Confirm copy 2 remains",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/2",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "2"
+                  ]
+                },
+                "description": "Deleting copy 1 leaves copy 2 in the database."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session 04",
+      "description": "Run with session4-library-api. Start with disposable copy 2 available (D).",
+      "item": [
+        {
+          "name": "Lab 8 - Rent a Copy",
+          "item": [
+            {
+              "name": "Rent an available copy",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/{{rentalCopyNo}}/rent",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "{{rentalCopyNo}}",
+                    "rent"
+                  ]
+                },
+                "description": "Start with the rental copy in status D."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Status is M\", () => pm.expect(pm.response.json().Status).to.eql(\"M\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Try renting it again",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/{{rentalCopyNo}}/rent",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "{{rentalCopyNo}}",
+                    "rent"
+                  ]
+                },
+                "description": "The first rental has already changed its status."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Try renting a missing copy",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/99/rent",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "99",
+                    "rent"
+                  ]
+                },
+                "description": "A valid URL can still point to a missing copy."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab 9 - Validate and Return",
+          "item": [
+            {
+              "name": "Reject copy number 0",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/0/rent",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "0",
+                    "rent"
+                  ]
+                },
+                "description": "Joi rejects the URL before it reaches SQL Server."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Reject a short ISBN",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/123/copies/2/rent",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "123",
+                    "copies",
+                    "2",
+                    "rent"
+                  ]
+                },
+                "description": "The ISBN must be 10 characters."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Reject a rental rate below 2.50",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/{{rentalCopyNo}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "{{rentalCopyNo}}"
+                  ]
+                },
+                "description": "Joi rejects this body before SQL Server runs the same constraint.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rentalRate\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Return the copy rented in Lab 8",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/{{rentalCopyNo}}/return",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "{{rentalCopyNo}}",
+                    "return"
+                  ]
+                },
+                "description": "This restores the copy to status D."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Status is D\", () => pm.expect(pm.response.json().Status).to.eql(\"D\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Try returning it again",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books/{{copyFixtureIsbn}}/copies/{{rentalCopyNo}}/return",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books",
+                    "{{copyFixtureIsbn}}",
+                    "copies",
+                    "{{rentalCopyNo}}",
+                    "return"
+                  ]
+                },
+                "description": "An available copy cannot be returned again."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab 10 - Search Books",
+          "item": [
+            {
+              "name": "Search for titles containing a word",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books?title=the",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books"
+                  ],
+                  "query": [
+                    {
+                      "key": "title",
+                      "value": "the"
+                    }
+                  ]
+                },
+                "description": "Try changing the title query parameter."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Matches contain the search term\", () => {",
+                      "  const term = pm.request.url.query.get(\"title\").toLowerCase();",
+                      "  const books = pm.response.json();",
+                      "  pm.expect(books).to.be.an(\"array\").that.is.not.empty;",
+                      "  pm.expect(books.every(book => book.Title.toLowerCase().includes(term))).to.be.true;",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List books without a title filter",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books"
+                  ]
+                },
+                "description": "Leaving out title lists every book."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Search for a title with no matches",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/books?title=zzzzzzzzzz",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "books"
+                  ],
+                  "query": [
+                    {
+                      "key": "title",
+                      "value": "zzzzzzzzzz"
+                    }
+                  ]
+                },
+                "description": "An empty search result is a successful response."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Returns an empty array\", () => pm.expect(pm.response.json()).to.eql([]));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
