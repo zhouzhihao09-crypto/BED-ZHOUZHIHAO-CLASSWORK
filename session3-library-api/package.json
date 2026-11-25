@@ -1,0 +1,19 @@
+{
+  "name": "session3-library-api",
+  "version": "1.0.0",
+  "description": "Session 3 Library API - Book and BookCopy management",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^5.3.0",
+    "mssql": "^12.7.14"
+  }
+}
